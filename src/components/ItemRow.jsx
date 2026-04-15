@@ -7,15 +7,119 @@ import {
   stockFillPct,
   formatINR,
 } from '../utils/iconMap'
+import { useIsMobile } from '../utils/useIsMobile'
 
 export default function ItemRow({ item, onClick }) {
   const [hovered, setHovered] = useState(false)
+  const isMobile = useIsMobile()
 
   const status   = getStockStatus(item)
   const cfg      = STATUS_CONFIG[status]
   const fillPct  = stockFillPct(item)
   const IconComp = getItemIcon(item)
   const catGrad  = getCategoryGradient(item.category)
+
+  if (isMobile) {
+    return (
+      <div
+        onClick={onClick}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '10px 12px',
+          backgroundColor: 'var(--card)',
+          borderRadius: '10px',
+          border: `1px solid var(--border)`,
+          cursor: 'pointer',
+          marginBottom: '6px',
+          boxShadow: 'var(--shadow-sm)',
+          animation: 'slideInRight 0.2s ease both',
+        }}
+      >
+        {/* Status bar */}
+        <div
+          style={{
+            width: '3px',
+            height: '36px',
+            borderRadius: '2px',
+            backgroundColor: cfg.color,
+            flexShrink: 0,
+          }}
+        />
+
+        {/* Icon */}
+        <div
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '9px',
+            background: catGrad,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <IconComp size={16} color="#ffffff" strokeWidth={1.8} />
+        </div>
+
+        {/* Name + SKU */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--foreground)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {item.name}
+          </div>
+          <div
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '10.5px',
+              color: 'var(--muted-foreground)',
+              marginTop: '1px',
+            }}
+          >
+            {item.sku}
+          </div>
+        </div>
+
+        {/* Right: status pill + price */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
+          <span
+            style={{
+              padding: '2px 7px',
+              borderRadius: '8px',
+              fontSize: '10px',
+              fontWeight: 600,
+              backgroundColor: cfg.bg,
+              color: cfg.text,
+              fontFamily: 'var(--font-mono)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {cfg.label}
+          </span>
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: 'var(--primary)',
+            }}
+          >
+            {formatINR(item.price)}
+          </span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div

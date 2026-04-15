@@ -133,7 +133,7 @@ export default function AddEditModal({ item, onClose, onSave }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
+        padding: '12px',
         animation: 'fadeIn 0.2s ease both',
       }}
     >

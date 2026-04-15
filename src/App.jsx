@@ -9,6 +9,7 @@ import ItemRow         from './components/ItemRow'
 import ItemDetailModal from './components/ItemDetailModal'
 import AddEditModal    from './components/AddEditModal'
 import BulkUploadModal from './components/BulkUploadModal'
+import { useIsMobile } from './utils/useIsMobile'
 
 // ── LocalStorage persistence ──────────────────────────────────────────────────
 const STORAGE_KEY    = 'hardwarehub_v1'
@@ -40,6 +41,8 @@ function loadDarkMode() {
 
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
+  const isMobile = useIsMobile()
+
   // ─ State ─
   const [items,            setItems]           = useState(loadItems)
   const [darkMode,         setDarkMode]        = useState(loadDarkMode)
@@ -47,11 +50,17 @@ export default function App() {
   const [searchQuery,      setSearchQuery]     = useState('')
   const [stockFilter,      setStockFilter]     = useState('all')
   const [viewMode,         setViewMode]        = useState('grid')
+  const [sidebarOpen,      setSidebarOpen]     = useState(false)
 
   const [selectedItem,  setSelectedItem]  = useState(null)
   const [editingItem,   setEditingItem]   = useState(null)
   const [showAddModal,  setShowAddModal]  = useState(false)
   const [showBulkModal, setShowBulkModal] = useState(false)
+
+  // Close sidebar when switching to desktop
+  useEffect(() => {
+    if (!isMobile) setSidebarOpen(false)
+  }, [isMobile])
 
   // ─ Effects ─
   useEffect(() => {
@@ -142,6 +151,11 @@ export default function App() {
     setEditingItem(item)
   }, [])
 
+  const handleCategorySelect = useCallback(cat => {
+    setSelectedCategory(cat)
+    if (isMobile) setSidebarOpen(false)
+  }, [isMobile])
+
   // ─ Render ─
   return (
     <div
@@ -159,29 +173,49 @@ export default function App() {
         onSearchChange={setSearchQuery}
         onAddItem={() => setShowAddModal(true)}
         onBulkUpload={() => setShowBulkModal(true)}
+        isMobile={isMobile}
+        onMenuToggle={() => setSidebarOpen(o => !o)}
       />
 
+      {/* Mobile sidebar backdrop */}
+      {isMobile && sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.45)',
+            zIndex: 240,
+            backdropFilter: 'blur(2px)',
+            animation: 'fadeIn 0.2s ease both',
+          }}
+        />
+      )}
+
       {/* Body: sidebar + main */}
-      <div style={{ display: 'flex', paddingTop: '64px' }}>
-        {/* Fixed sidebar */}
+      <div style={{ display: 'flex', paddingTop: '56px' }}>
+        {/* Sidebar */}
         <Sidebar
           selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          onSelectCategory={handleCategorySelect}
           categoryCounts={categoryCounts}
           stockStatusCounts={stockStatusCounts}
+          isMobile={isMobile}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
 
         {/* Scrollable main */}
         <main
           style={{
             flex: 1,
-            marginLeft: '256px',
-            minHeight: 'calc(100vh - 64px)',
+            marginLeft: isMobile ? 0 : '256px',
+            minHeight: 'calc(100vh - 56px)',
           }}
         >
           <HeroBanner stats={stats} />
 
-          <div style={{ padding: '24px' }}>
+          <div style={{ padding: isMobile ? '14px' : '24px' }}>
             <Toolbar
               count={filteredItems.length}
               stockFilter={stockFilter}
@@ -213,8 +247,10 @@ export default function App() {
                 key="grid"
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-                  gap: '18px',
+                  gridTemplateColumns: isMobile
+                    ? 'repeat(auto-fill, minmax(160px, 1fr))'
+                    : 'repeat(auto-fill, minmax(240px, 1fr))',
+                  gap: isMobile ? '12px' : '18px',
                   animation: 'fadeIn 0.25s ease both',
                 }}
               >

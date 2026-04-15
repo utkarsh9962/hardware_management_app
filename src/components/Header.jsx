@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Search, Moon, Sun, Upload, Plus, X } from 'lucide-react'
+import { Search, Moon, Sun, Upload, Plus, X, Menu } from 'lucide-react'
 
-export default function Header({ darkMode, onToggleDark, searchQuery, onSearchChange, onAddItem, onBulkUpload }) {
+export default function Header({ darkMode, onToggleDark, searchQuery, onSearchChange, onAddItem, onBulkUpload, isMobile, onMenuToggle }) {
   const [focused, setFocused] = useState(false)
   const [addHover, setAddHover] = useState(false)
   const [bulkHover, setBulkHover] = useState(false)
@@ -15,62 +15,87 @@ export default function Header({ darkMode, onToggleDark, searchQuery, onSearchCh
         left: 0,
         right: 0,
         zIndex: 200,
-        height: '64px',
+        height: '56px',
         backgroundColor: 'var(--card)',
         borderBottom: '1.5px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 20px',
-        gap: '14px',
+        padding: isMobile ? '0 12px' : '0 20px',
+        gap: isMobile ? '8px' : '14px',
         boxShadow: '0 1px 12px rgba(217,119,6,0.08)',
         transition: 'background-color 0.2s',
       }}
     >
+      {/* ── Hamburger (mobile only) ── */}
+      {isMobile && (
+        <button
+          onClick={onMenuToggle}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            border: '1.5px solid var(--border)',
+            backgroundColor: 'var(--accent)',
+            color: 'var(--foreground)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <Menu size={18} />
+        </button>
+      )}
+
       {/* ── Logo ── */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '8px',
           flexShrink: 0,
-          minWidth: '200px',
+          minWidth: isMobile ? 'unset' : '200px',
         }}
       >
-        <span style={{ fontSize: '26px', lineHeight: 1 }}>🔧</span>
+        <span style={{ fontSize: isMobile ? '22px' : '26px', lineHeight: 1 }}>🔧</span>
         <div>
           <div
             style={{
               fontFamily: 'var(--font-serif)',
-              fontSize: '17px',
+              fontSize: isMobile ? '14px' : '17px',
               fontWeight: 700,
               color: 'var(--primary)',
               lineHeight: 1.15,
               letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
             }}
           >
             HardwareHub
           </div>
-          <div
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '9.5px',
-              color: 'var(--muted-foreground)',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Inventory Manager
-          </div>
+          {!isMobile && (
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '9.5px',
+                color: 'var(--muted-foreground)',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Inventory Manager
+            </div>
+          )}
         </div>
       </div>
 
       {/* ── Search ── */}
-      <div style={{ flex: 1, maxWidth: '520px', position: 'relative' }}>
+      <div style={{ flex: 1, position: 'relative' }}>
         <Search
           size={15}
           style={{
             position: 'absolute',
-            left: '11px',
+            left: '10px',
             top: '50%',
             transform: 'translateY(-50%)',
             color: focused ? 'var(--primary)' : 'var(--muted-foreground)',
@@ -80,19 +105,19 @@ export default function Header({ darkMode, onToggleDark, searchQuery, onSearchCh
         />
         <input
           type="text"
-          placeholder="Search name, SKU, category, size…"
+          placeholder={isMobile ? 'Search…' : 'Search name, SKU, category, size…'}
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={{
             width: '100%',
-            padding: '8px 32px 8px 34px',
+            padding: '7px 30px 7px 32px',
             borderRadius: '8px',
             border: `1.5px solid ${focused ? 'var(--primary)' : 'var(--border)'}`,
             backgroundColor: 'var(--input)',
             color: 'var(--foreground)',
-            fontSize: '13.5px',
+            fontSize: '13px',
             fontFamily: 'var(--font-sans)',
             outline: 'none',
             boxShadow: focused ? '0 0 0 3px rgba(217,119,6,0.15)' : 'none',
@@ -126,7 +151,7 @@ export default function Header({ darkMode, onToggleDark, searchQuery, onSearchCh
       </div>
 
       {/* ── Right actions ── */}
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '10px' }}>
         {/* Dark mode */}
         <button
           title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -151,13 +176,16 @@ export default function Header({ darkMode, onToggleDark, searchQuery, onSearchCh
           {darkMode ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        {/* Bulk Upload */}
+        {/* Bulk Upload — icon only on mobile */}
         <button
           onClick={onBulkUpload}
           onMouseEnter={() => setBulkHover(true)}
           onMouseLeave={() => setBulkHover(false)}
+          title="Bulk Upload"
           style={{
-            padding: '7px 14px',
+            padding: isMobile ? '0' : '7px 14px',
+            width: isMobile ? '36px' : 'auto',
+            height: isMobile ? '36px' : 'auto',
             borderRadius: '8px',
             border: '1.5px solid var(--border)',
             backgroundColor: bulkHover ? 'var(--muted)' : 'var(--accent)',
@@ -167,23 +195,26 @@ export default function Header({ darkMode, onToggleDark, searchQuery, onSearchCh
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '6px',
             flexShrink: 0,
             transition: 'background-color 0.15s',
-            whiteSpace: 'nowrap',
           }}
         >
           <Upload size={14} />
-          Bulk Upload
+          {!isMobile && 'Bulk Upload'}
         </button>
 
-        {/* Add Inventory */}
+        {/* Add Inventory — icon only on mobile */}
         <button
           onClick={onAddItem}
           onMouseEnter={() => setAddHover(true)}
           onMouseLeave={() => setAddHover(false)}
+          title="Add Inventory"
           style={{
-            padding: '7px 18px',
+            padding: isMobile ? '0' : '7px 18px',
+            width: isMobile ? '36px' : 'auto',
+            height: isMobile ? '36px' : 'auto',
             borderRadius: '8px',
             border: 'none',
             background: addHover
@@ -195,17 +226,17 @@ export default function Header({ darkMode, onToggleDark, searchQuery, onSearchCh
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '6px',
             flexShrink: 0,
             boxShadow: addHover
               ? '0 4px 16px rgba(217,119,6,0.45)'
               : '0 2px 8px rgba(217,119,6,0.3)',
             transition: 'background 0.15s, box-shadow 0.15s',
-            whiteSpace: 'nowrap',
           }}
         >
           <Plus size={15} />
-          Add Inventory
+          {!isMobile && 'Add Inventory'}
         </button>
       </div>
     </header>

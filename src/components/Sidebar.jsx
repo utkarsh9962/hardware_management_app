@@ -1,31 +1,98 @@
 import { useState } from 'react'
+import { X } from 'lucide-react'
 import { CATEGORIES } from '../data/sampleData'
 
-export default function Sidebar({ selectedCategory, onSelectCategory, categoryCounts, stockStatusCounts }) {
+export default function Sidebar({ selectedCategory, onSelectCategory, categoryCounts, stockStatusCounts, isMobile, isOpen, onClose }) {
   const [hoveredCat, setHoveredCat] = useState(null)
   const totalItems = Object.values(categoryCounts).reduce((a, b) => a + b, 0)
 
   const getCount = (catId) => catId === 'all' ? totalItems : (categoryCounts[catId] ?? 0)
 
+  const sidebarStyle = isMobile
+    ? {
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: '280px',
+        zIndex: 250,
+        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.25s ease',
+      }
+    : {
+        position: 'fixed',
+        left: 0,
+        top: '56px',
+        bottom: 0,
+        width: '256px',
+        zIndex: 100,
+      }
+
   return (
     <aside
       style={{
-        position: 'fixed',
-        left: 0,
-        top: '64px',
-        bottom: 0,
-        width: '256px',
+        ...sidebarStyle,
         backgroundColor: 'var(--sidebar)',
         borderRight: '1px solid var(--sidebar-border)',
         display: 'flex',
         flexDirection: 'column',
         overflowY: 'auto',
         overflowX: 'hidden',
-        zIndex: 100,
         padding: '12px 10px 16px',
-        transition: 'background-color 0.2s',
+        transition: isMobile ? 'transform 0.25s ease' : 'background-color 0.2s',
       }}
     >
+      {/* Mobile header row with close button */}
+      {isMobile && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 10px 12px',
+            borderBottom: '1px solid var(--border)',
+            marginBottom: '8px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>🔧</span>
+            <span
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: '15px',
+                fontWeight: 700,
+                color: 'var(--primary)',
+              }}
+            >
+              HardwareHub
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              width: '30px',
+              height: '30px',
+              borderRadius: '8px',
+              border: '1.5px solid var(--border)',
+              backgroundColor: 'var(--accent)',
+              color: 'var(--foreground)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <X size={15} />
+          </button>
+        </div>
+      )}
+
       {/* Categories label */}
       <div
         style={{
@@ -58,7 +125,7 @@ export default function Sidebar({ selectedCategory, onSelectCategory, categoryCo
                 display: 'flex',
                 alignItems: 'center',
                 gap: '9px',
-                padding: '8px 10px',
+                padding: isMobile ? '10px 10px' : '8px 10px',
                 borderRadius: '8px',
                 border: 'none',
                 cursor: 'pointer',

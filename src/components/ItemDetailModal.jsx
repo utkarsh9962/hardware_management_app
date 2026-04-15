@@ -61,7 +61,7 @@ export default function ItemDetailModal({ item, onClose, onEdit, onDelete }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
+        padding: '12px',
         animation: 'fadeIn 0.2s ease both',
       }}
     >

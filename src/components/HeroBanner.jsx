@@ -1,20 +1,24 @@
-function StatCard({ label, value, note }) {
+import { useIsMobile } from '../utils/useIsMobile'
+
+function StatCard({ label, value, note, isMobile, borderRight, borderBottom }) {
   return (
     <div
       style={{
-        padding: '20px 28px',
+        padding: isMobile ? '14px 10px' : '20px 28px',
         textAlign: 'center',
-        flex: 1,
+        flex: isMobile ? '0 0 calc(50% - 0.5px)' : 1,
+        borderRight: borderRight ? '1px solid rgba(255,255,255,0.18)' : 'none',
+        borderBottom: borderBottom ? '1px solid rgba(255,255,255,0.18)' : 'none',
       }}
     >
       <div
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: '32px',
+          fontSize: isMobile ? '24px' : '32px',
           fontWeight: 800,
           color: '#ffffff',
           lineHeight: 1,
-          marginBottom: '6px',
+          marginBottom: '5px',
           letterSpacing: '-0.02em',
         }}
       >
@@ -22,7 +26,7 @@ function StatCard({ label, value, note }) {
       </div>
       <div
         style={{
-          fontSize: '12.5px',
+          fontSize: isMobile ? '11px' : '12.5px',
           color: 'rgba(255,255,255,0.82)',
           fontWeight: 500,
           letterSpacing: '0.02em',
@@ -33,9 +37,9 @@ function StatCard({ label, value, note }) {
       {note && (
         <div
           style={{
-            fontSize: '11px',
+            fontSize: '10px',
             color: 'rgba(255,255,255,0.55)',
-            marginTop: '3px',
+            marginTop: '2px',
           }}
         >
           {note}
@@ -59,6 +63,7 @@ function Divider() {
 }
 
 export default function HeroBanner({ stats }) {
+  const isMobile = useIsMobile()
   const fmtNum = n => Number(n).toLocaleString('en-IN')
 
   const fmtValue = n => {
@@ -73,7 +78,7 @@ export default function HeroBanner({ stats }) {
       <div
         style={{
           background: 'linear-gradient(135deg, #d97706 0%, #b45309 55%, #92400e 100%)',
-          padding: '28px 32px 20px',
+          padding: isMobile ? '16px 16px 14px' : '28px 32px 20px',
           position: 'relative',
         }}
       >
@@ -103,7 +108,7 @@ export default function HeroBanner({ stats }) {
         ))}
 
         {/* Title */}
-        <div style={{ marginBottom: '20px', position: 'relative', zIndex: 1 }}>
+        <div style={{ marginBottom: isMobile ? '12px' : '20px', position: 'relative', zIndex: 1 }}>
           <div
             style={{
               fontFamily: 'var(--font-mono)',
@@ -119,7 +124,7 @@ export default function HeroBanner({ stats }) {
           <div
             style={{
               fontFamily: 'var(--font-serif)',
-              fontSize: '22px',
+              fontSize: isMobile ? '18px' : '22px',
               fontWeight: 700,
               color: '#ffffff',
               lineHeight: 1.2,
@@ -129,26 +134,46 @@ export default function HeroBanner({ stats }) {
           </div>
         </div>
 
-        {/* Stats row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'stretch',
-            position: 'relative',
-            zIndex: 1,
-            background: 'rgba(0,0,0,0.08)',
-            borderRadius: '12px',
-            backdropFilter: 'blur(4px)',
-          }}
-        >
-          <StatCard label="Total Items" value={fmtNum(stats.totalItems)} />
-          <Divider />
-          <StatCard label="Out of Stock" value={fmtNum(stats.outOfStock)} note="Needs restocking" />
-          <Divider />
-          <StatCard label="Low Stock" value={fmtNum(stats.lowStock)} note="Below minimum" />
-          <Divider />
-          <StatCard label="Inventory Value" value={fmtValue(stats.totalValue)} />
-        </div>
+        {/* Stats — 2×2 grid on mobile, single row on desktop */}
+        {isMobile ? (
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              position: 'relative',
+              zIndex: 1,
+              background: 'rgba(0,0,0,0.08)',
+              borderRadius: '12px',
+              backdropFilter: 'blur(4px)',
+              overflow: 'hidden',
+            }}
+          >
+            <StatCard label="Total Items"     value={fmtNum(stats.totalItems)}   isMobile borderRight borderBottom />
+            <StatCard label="Out of Stock"    value={fmtNum(stats.outOfStock)}   note="Restock needed" isMobile borderBottom />
+            <StatCard label="Low Stock"       value={fmtNum(stats.lowStock)}     note="Below minimum" isMobile borderRight />
+            <StatCard label="Inventory Value" value={fmtValue(stats.totalValue)} isMobile />
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'stretch',
+              position: 'relative',
+              zIndex: 1,
+              background: 'rgba(0,0,0,0.08)',
+              borderRadius: '12px',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <StatCard label="Total Items"     value={fmtNum(stats.totalItems)} />
+            <Divider />
+            <StatCard label="Out of Stock"    value={fmtNum(stats.outOfStock)}  note="Needs restocking" />
+            <Divider />
+            <StatCard label="Low Stock"       value={fmtNum(stats.lowStock)}    note="Below minimum" />
+            <Divider />
+            <StatCard label="Inventory Value" value={fmtValue(stats.totalValue)} />
+          </div>
+        )}
       </div>
 
       {/* ── Alert strip ── */}
@@ -157,7 +182,7 @@ export default function HeroBanner({ stats }) {
           style={{
             backgroundColor: 'var(--status-out-bg)',
             borderTop: '1px solid var(--status-out-color)',
-            padding: '8px 32px',
+            padding: isMobile ? '8px 16px' : '8px 32px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -168,7 +193,7 @@ export default function HeroBanner({ stats }) {
           <span
             style={{
               color: 'var(--status-out-text)',
-              fontSize: '12.5px',
+              fontSize: '12px',
               fontWeight: 500,
             }}
           >
